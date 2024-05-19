@@ -263,7 +263,6 @@ int is_reserved(char str[MAX_NAME_LENGTH])
 {
 
     /* Opcode or Register */
-    /* if ((strcmp(whichOpcode(str), no_opcode) != 0) || (strcmp(whichRegister(str), no_register) != 0)) */
     if ((whichOpcode(str) != no_opcode) || (whichRegister(str) != no_register))
         return 0;
 
@@ -397,6 +396,20 @@ void add_new_entry(SymbolTable *st, char *symbol_name, SymbolType type, int symb
     st->count++;
 
     return;
+}
+
+int get_symbol_value(SymbolTable *st, char *symbol_name)
+{
+    /* Return symbol (named 'symbol_name') his value */
+    SymbolEntry *current;
+
+    for (current = st->entries; current->next != NULL; current = current->next)
+    {
+        if (strcmp(current->key, symbol_name) == 0)
+            return current->value;
+    }
+
+    return -1;
 }
 
 int is_exsits(SymbolTable *st, char *key)
@@ -606,13 +619,20 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code)
             while (str_value != NULL)
             {
                 clean_spaces(str_value);
-                if (is_valid_number(line_count, str_value))
+                if (is_exsits(st, str_value) != -1)
+                {
+                    data_value = get_symbol_value(st, str_value);
+                }
+                else if (is_valid_number(line_count, str_value))
                 {
                     error_flag = true;
                     break;
                 }
+                else 
+                {
+                    data_value = atoi(str_value);
+                }
 
-                data_value = atoi(str_value);
                 add_new_code(&datas_code, &DC, data_value);
                 str_value = strtok(NULL, ",");
             }
