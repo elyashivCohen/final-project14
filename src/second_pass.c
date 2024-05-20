@@ -1,28 +1,10 @@
 #include "data.h"
 
-extern int is_valid_number(int line_number, char *value);
 extern char *regArr[AMOUNT_OF_REGISTER];
 static int IC, L = 0, line_number = 0;
 FILE *ext_file;
 char *fileName;
 
-/*SymbolEntry *is_a_label(char *first_field, SymbolTable *Table)
-{
-    SymbolEntry *tmp;
-
-    tmp = (SymbolEntry *)malloc(sizeof(SymbolEntry));
-
-    if (Table == NULL || first_field == NULL)
-        return NULL;
-    for (tmp = Table->entries; tmp->next != NULL; tmp = tmp->next)
-    {
-        if (!strcmp(tmp->key, first_field) && (tmp->type == 1 || tmp->type == 3))
-        {
-            return tmp;
-        }
-    }
-    return NULL;
-}*/
 int mark_as_entry(char *cur_feild, SymbolTable *Table)
 {
     SymbolEntry *tmp;
@@ -61,7 +43,10 @@ int print_to_entry_file(SymbolTable *Table)
         }
     }
     entry = NULL;
-    fclose(ent_file);
+    if (ent_file)
+    {
+        fclose(ent_file);
+    }
     free(curFileName);
     return 1;
 }
@@ -103,23 +88,39 @@ Bool is_extern(SymbolEntry *entry, SymbolTable *Table)
 void args_classify(char *args, SymbolTable *Table, int **arr, opcodeType type)
 {
     int i;
+    Bool flag = False;
     char *firstPart, *secondPart;
     SymbolEntry *entry;
-    /*static FILE *entPTR, *extPTR;*/
 
     entry = (SymbolEntry *)malloc(sizeof(SymbolEntry));
     if ((*args) == '#')
     {
         args++;
-        if (!is_valid_number(get_line_number(), args))
+        if ((*args) == '-' || (*args) == '+')
+        {
+            if ((*args) == '-')
+            {
+                flag = True;
+            }
+            args++;
+        }
+        if (isdigit(*args))
         {
             (**arr) = atoi(args);
+            if (flag)
+            {
+                (**arr) = -(**arr);
+            }
             (**arr) <<= 2;
         }
         entry = get_entry(args, Table);
         if (entry)
         {
             (**arr) = entry->value;
+            if (flag)
+            {
+                (**arr) = -(**arr);
+            }
             (**arr) <<= 2;
             if (is_extern(entry, Table))
             {
@@ -378,8 +379,8 @@ int second_pass(char *input_filename, SymbolTable *Table, int **arr)
         perror("Error: can't open am file");
         exit(EXIT_FAILURE);
     }
-
     tmp = (*arr);
+
     IC = 0;
     printf("Running the second pass for %s! \n", input_filename);
     while (fgets(line, MAX_LINE_LENGTH, file_ptr) != NULL)
@@ -402,10 +403,10 @@ int second_pass(char *input_filename, SymbolTable *Table, int **arr)
     print_to_entry_file(Table);
 
     fclose(file_ptr);
-
     free(currFileName);
-
-    fclose(ext_file);
-
+    if (ext_file)
+    {
+        fclose(ext_file);
+    }
     return 0;
 }
