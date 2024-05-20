@@ -18,6 +18,6 @@ int is_label(char *str);
 void add_new_entry(SymbolTable *st, char *symbol_name, SymbolType type, int symbol_value);
 int get_symbol_value(SymbolTable *st, char *symbol_name);
 int check_symbol(int line_number, SymbolTable *st, char *symbol_name);
-int first_pass(char *input_filename, SymbolTable *st, int **binary_code);
+int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *insteraction_counter ,int *data_insteraction_counter);
 
 #endif

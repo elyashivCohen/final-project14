@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
 {
 
     char *input_filename;
-    int i;
+    int i, IC, DC;
     /* Create a symbol table which will create in 'first_pass' and used in 'second_pass' */
     SymbolTable symbol_table;
     /* Create an int array which will hold the binary code */
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         binary_code = NULL;
 
         /* Second part of the project: create the symbol table & the initial file of the binary code */
-        if (first_pass(input_filename, &symbol_table, &binary_code) != 0)
+        if (first_pass(input_filename, &symbol_table, &binary_code, &IC, &DC) != 0)
             continue;
 
         /* Third part of the project: fill the missing parts of the binary code & create the output
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         if (second_pass(input_filename, &symbol_table, &binary_code) != 0)
             continue;
 
-        if (encryption(&binary_code, input_filename, 15, 20) != 0)
+        if (encryption(&binary_code, input_filename, IC, DC) != 0)
             continue;
 
         printf("Ran the assembler successfully for %s! \n", input_filename);

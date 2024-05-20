@@ -453,7 +453,7 @@ int check_symbol(int line_number, SymbolTable *st, char *symbol_name)
     return 0;
 }
 
-int first_pass(char *input_filename, SymbolTable *st, int **binary_code)
+int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *insteraction_counter ,int *data_counter)
 {
     char input_file_path[MAX_LINE_LENGTH];
     FILE *input_file;
@@ -802,7 +802,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code)
     /* Close the input file */
     fclose(input_file);
 
-    /* Create binary_code */
+    /* Create binary_code & set IC and DC */
     *binary_code = (int *)malloc((DC + IC) * sizeof(int));
 
     for (i = 0; i < IC; i++)
@@ -814,6 +814,9 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code)
     }
     free(insteractions_code);
     free(datas_code);
+
+    *insteraction_counter = IC;
+    *data_counter = DC;
 
     return 0;
 }
