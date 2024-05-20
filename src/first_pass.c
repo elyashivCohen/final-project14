@@ -2,10 +2,17 @@
 
 void calculate_L(int *l, int dist, int src)
 {
-
-    /* Since each aderssing methos is 1 execpt the 2nd method and if
-         both are the 3rd method: L=1  */
-    (*l) += 2 + (dist == 2) + (src == 2) - (dist == 3 && src == 3);
+    if (src == -1 || dist == -1) 
+    {
+        (*l) += 1 + (dist == 2);
+    }
+    else 
+    {
+        /* Since each aderssing methos is 1 execpt the 2nd method and if
+            both are the 3rd method: L=1  */
+        (*l) += 2 + (dist == 2) + (src == 2) - (dist == 3 && src == 3);
+    }
+    
 }
 
 int validate_source_method(int line_number, opcode op, int addressing_method)
