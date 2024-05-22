@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     /* Create a symbol table which will create in 'first_pass' and used in 'second_pass' */
     SymbolTable symbol_table;
     /* Create an int array which will hold the binary code */
-    int *binary_code;
+    int *binary_code = NULL;
 
     /* Validate input files */
     if (argc < 2)
@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
         /* Initialize the symbol table & binary code array for each file */
         symbol_table.count = 0;
         symbol_table.entries = NULL;
-        binary_code = NULL;
 
         /* Second part of the project: create the symbol table & the initial file of the binary code */
         if (first_pass(input_filename, &symbol_table, &binary_code, &IC, &DC) != 0)
@@ -41,13 +40,15 @@ int main(int argc, char *argv[])
             continue;
 
         if (encryption(&binary_code, input_filename, IC, DC) != 0)
+        {
+            free(binary_code);
             continue;
+        }
 
         printf("Ran the assembler successfully for %s! \n", input_filename);
 
         /* Free the memory allocated for the symbol table & binary_code */
         freeSymbolTable(&symbol_table);
-        /*free(binary_code);*/
     }
 
     return 0;

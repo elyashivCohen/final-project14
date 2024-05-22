@@ -1,5 +1,5 @@
 #include "data.h"
-
+/*array of opcode commands*/
 char *opcodearray[AMOUNT_OF_OPCODE] = {
     "mov",
     "cmp",
@@ -18,7 +18,7 @@ char *opcodearray[AMOUNT_OF_OPCODE] = {
     "rts",
     "hlt",
 };
-
+/*array of opcode register name*/
 char *regArr[AMOUNT_OF_REGISTER] = {
     "r0",
     "r1",
@@ -31,6 +31,7 @@ char *regArr[AMOUNT_OF_REGISTER] = {
     "r8",
 };
 
+/*check if the token is opcode*/
 opcode is_opcode(char *token)
 {
     int i;
@@ -46,20 +47,22 @@ opcode is_opcode(char *token)
 
 int get_entry_val(char *first_field, SymbolTable *Table)
 {
+    /*get the value of given label/data string name */
     int val = 0;
     SymbolEntry *entry;
-    entry = (SymbolEntry *)malloc(sizeof(SymbolEntry));
 
     entry = get_entry(first_field, Table);
     if (entry != NULL)
     {
         val = entry->value;
     }
+    entry = NULL;
     return val;
 }
 
 instructionType get_instruction_type(char *word)
 {
+    /*get the type of instruction by the given string pointer*/
     opcode ins = is_opcode(word);
     if (ins > 0)
     {
@@ -94,6 +97,7 @@ instructionType get_instruction_type(char *word)
 
 opcodeType address_mathods(char *opName)
 {
+    /*return the amount of argument of any given opcode command*/
     int i;
     for (i = 0; i < (AMOUNT_OF_OPCODE + 1); i++)
     {

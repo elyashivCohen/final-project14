@@ -1,8 +1,6 @@
 #include "data.h"
 
-#define MAX_OP_IN_LINE 7
-
-char encrpt[MAX_OP_IN_LINE];
+#define MAX_OP_IN_LINE 7 /*Amount of cipher keys*/
 
 void line_encryption(unsigned short int num, FILE *ob_file)
 {
@@ -10,14 +8,14 @@ void line_encryption(unsigned short int num, FILE *ob_file)
     int i, j, tmp;
     char ob[MAX_OP_IN_LINE];
 
-    if (linCounter > 1000)
+    if (linCounter > 1000) /*print the line number of the given wordcode*/
     {
         fprintf(ob_file, "%d ", linCounter);
     }
     else
         fprintf(ob_file, "0%d ", linCounter);
 
-    for (i = 0; i < 7; i++)
+    for (i = 0; i < 7; i++) /*encrypting the number and insert to array*/
     {
         tmp = num & 0x3;
         switch (tmp)
@@ -43,6 +41,7 @@ void line_encryption(unsigned short int num, FILE *ob_file)
         }
     }
     linCounter++;
+    /*print the array from end to start into encryption file*/
     for (j = strlen(ob) - 1; j > -1; j--)
     {
         fprintf(ob_file, "%c", ob[j]);
@@ -59,7 +58,8 @@ int encryption(int **array, char *fileName, int instLength, int dataLength)
     curFileName = (char *)malloc(strlen(fileName) + 4);
     sprintf(curFileName, "%s%s", fileName, ".ob");
 
-    if ((ob_file = fopen(curFileName, "r")))
+    printf("Running the encryption for %s! \n", fileName);
+    if ((ob_file = fopen(curFileName, "r"))) /*if the file been created overwrite the file*/
         rewind(ob_file);
 
     if ((ob_file = fopen(curFileName, "w+")) == NULL)
@@ -67,18 +67,14 @@ int encryption(int **array, char *fileName, int instLength, int dataLength)
         perror("Error: ");
         return -1;
     }
-    /*
-    print the title of file
-    amount of instructions ,  amount of data
-    */
-    fprintf(ob_file, "  %d %d\n", instLength, dataLength);
 
-    for (i = 0; i < (instLength + dataLength); i++)
+    fprintf(ob_file, "  %d %d\n", instLength, dataLength); /* print the title of file amount of instructions ,  amount of data*/
+
+    for (i = 0; i < (instLength + dataLength); i++) /*encrypting line by line. */
     {
         line_encryption(**(array), ob_file);
         (*array)++;
     }
-    printf("Running the encryption for %s! \n", fileName);
     free(curFileName);
     fclose(ob_file);
     return 0;

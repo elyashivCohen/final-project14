@@ -1,6 +1,7 @@
 #define EXT_LEN 4 /* Length of the extension file name. */
 #define INPUT_EXT ".as"
 #define OUTPUT_EXT ".am"
+#define EXT ".ext"
 
 #define MAX_LINE_LENGTH 80
 #define MAX_NAME_LENGTH 31
