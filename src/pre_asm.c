@@ -67,7 +67,7 @@ int pre_asm(char *input_filename)
     int line_count = 1, macro_count = 0, macro_num;
     char line[MAX_LINE_LENGTH];
     char first_field[MAX_LINE_LENGTH];
-    bool mcr_flag = false;
+    Bool mcr_flag = False;
     char macro_name[MAX_LINE_LENGTH];
 
     /* Check if input file ('.as') exsits: */
@@ -121,7 +121,7 @@ int pre_asm(char *input_filename)
         /* If a new mcro declared */
         else if (strcmp(first_field, START_OF_MACRO) == 0)
         {
-            mcr_flag = true;
+            mcr_flag = True;
             /* Get macro name*/
             sscanf(line, "%*s %s", macro_name);
 
@@ -144,13 +144,13 @@ int pre_asm(char *input_filename)
         }
 
         /* If inside a macro: */
-        else if (mcr_flag)
+        else if (mcr_flag == True)
         {
 
             /* Check if end of mcr: */
             if (strcmp(first_field, END_OF_MACRO) == 0)
             {
-                mcr_flag = false;
+                mcr_flag = False;
                 macro_count++;
             }
             /* Add line to macro table */

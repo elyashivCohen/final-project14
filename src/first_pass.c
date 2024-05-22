@@ -463,7 +463,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
     int IC = 0, DC = 0, L, i, source_addressing_method_number, destination_addressing_method_number;
     opcode op_code;
     int *insteractions_code = NULL, *datas_code = NULL, code_value;
-    bool label_flag = false, error_flag = false;
+    Bool label_flag = False, error_flag = False;
 
     /* Check if input file ('.am') exsits: */
     strcpy(input_file_path, input_filename);
@@ -483,7 +483,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
     {
 
         line_count++;
-        label_flag = false;
+        label_flag = False;
 
         /* Ignore comments */
         if (line[0] == ';')
@@ -506,7 +506,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             clean_spaces(symbol_name);
             if (is_valid_string_name(line_count, symbol_name) != 0)
             {
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -514,7 +514,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             clean_spaces(str_value);
             if (is_valid_number(line_count, str_value))
             {
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
             symbol_value = atoi(str_value);
@@ -522,7 +522,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             /* Check validation of the symbol */
             if (check_symbol(line_count, st, symbol_name) != 0)
             {
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -541,7 +541,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
             if (is_valid_string_name(line_count, label_name) != 0)
             {
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -550,18 +550,18 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             strcpy(line, rest_of_line);
             sscanf(line, "%s", first_field);
 
-            label_flag = true;
+            label_flag = True;
         }
 
         if (strcmp(first_field, STRING_DECLARTION) == 0)
         {
-            if (label_flag)
+            if (label_flag == True)
             {
 
                 /* Check validation of the symbol */
                 if (check_symbol(line_count, st, label_name) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -576,7 +576,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             if (strings == NULL)
             {
                 printf("Error in line %d: Declared a '.string' statement without '\"'\n", line_count);
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -597,13 +597,13 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
         else if (strcmp(first_field, DATA_DECLARTION) == 0)
         {
 
-            if (label_flag)
+            if (label_flag == True)
             {
 
                 /* Check validation of the symbol */
                 if (check_symbol(line_count, st, label_name) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -619,7 +619,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             if (str_value == NULL)
             {
                 printf("Error in line %d: Declared a '.data' statement without any numbers\n", line_count);
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -632,7 +632,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                 }
                 else if (is_valid_number(line_count, str_value))
                 {
-                    error_flag = true;
+                    error_flag = True;
                     break;
                 }
                 else 
@@ -665,13 +665,13 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
         else
         {
 
-            if (label_flag)
+            if (label_flag == True)
             {
 
                 /* Check validation of the symbol */
                 if (check_symbol(line_count, st, label_name) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -681,7 +681,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             if (whichOpcode(first_field) == no_opcode)
             {
                 printf("Error in line %d: '%s' is not an known opcode!\n", line_count, first_field);
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -700,7 +700,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             if (get_opcode_operands(op_code) != num_of_operands)
             {
                 printf("Error in line %d: The number of operands are invalid for %s!\n", line_count, first_field);
-                error_flag = true;
+                error_flag = True;
                 continue;
             }
 
@@ -713,14 +713,14 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                 destination_addressing_method_number = get_addressing_method(line_count, rest_of_line);
                 if (destination_addressing_method_number == -1)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
                 /* Validate that the destination method is valid to the opcode */
                 if (validate_destination_method(line_count, op_code, destination_addressing_method_number) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -746,14 +746,14 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                 source_addressing_method_number = get_addressing_method(line_count, rest_of_line);
                 if (source_addressing_method_number == -1)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
                 /* Validate that the source method is valid to the opcode */
                 if (validate_source_method(line_count, op_code, source_addressing_method_number) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -766,14 +766,14 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                 destination_addressing_method_number = get_addressing_method(line_count, operand);
                 if (destination_addressing_method_number == -1)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
                 /* Validate that the destination method is valid to the opcode */
                 if (validate_destination_method(line_count, op_code, destination_addressing_method_number) != 0)
                 {
-                    error_flag = true;
+                    error_flag = True;
                     continue;
                 }
 
@@ -793,7 +793,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
     }
 
     /* If a an error found stop the running */
-    if (error_flag)
+    if (error_flag == True)
         return 1;
 
     /* Increase each '.data' symbol in the symbol table by IC + IC_START_ADDRESS(=100) */
