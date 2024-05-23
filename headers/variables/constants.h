@@ -3,7 +3,7 @@
 #define OUTPUT_EXT ".am"
 #define EXT ".ext"
 
-#define MAX_LINE_LENGTH 80
+#define MAX_LINE_LENGTH 81
 #define MAX_NAME_LENGTH 31
 #define AMOUNT_OF_OPCODE 16
 

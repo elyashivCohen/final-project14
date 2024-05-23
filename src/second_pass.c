@@ -66,10 +66,11 @@ int print_to_ext_file(int line, char *key)
     curFileName = (char *)malloc(strlen(fileName) + 4);
     sprintf(curFileName, "%s%s", fileName, EXT);
 
-    if (ext_file == NULL) /*open the file only if is'nt open in a past*/
+    /*open the file only if is'nt open in a past*/
+    if (ext_file == NULL)
     {
         ext_file = fopen(curFileName, "w");
-        if (ext_file == NULL) /*can't open the file*/
+        if (ext_file == NULL)
         {
             perror("cant open this file");
             return 0;
@@ -81,6 +82,7 @@ int print_to_ext_file(int line, char *key)
         fprintf(ext_file, "%s\t0%d\n", key, line);
     else
         fprintf(ext_file, "%s\t%d\n", key, line);
+
     free(curFileName);
     return 1;
 }
@@ -136,22 +138,33 @@ void args_classify(char *args, SymbolTable *Table, int **arr)
             }
         }
     }
-    else if ((i = is_register(args))) /*insert register wordcode*/
+    /*insert register wordcode*/
+    else if ((i = is_register(args)))
     {
         (**arr) = (i - 1);
+        L++;
+        return;
     }
     else if (is_index_add(args, &firstPart, &secondPart)) /*insert index adderss*/
     {
-        (**arr) = get_entry_val(firstPart, Table);
+        entry = get_entry(firstPart, Table);
+        (**arr) = entry->value;
         (**arr) <<= 2;
         (**arr) += 2;
-
+        /*type 3 = external label and */
+        if (entry->type == 3)
+        {
+            print_to_ext_file(L + IC, entry->key);
+            (**arr)--;
+        }
         (*arr)++;
+
         if (atoi(secondPart))
             (**arr) = atoi(secondPart);
         else
             (**arr) = get_entry_val(secondPart, Table);
         (**arr) <<= 2;
+
         L = L + 2;
         free(firstPart);
         free(secondPart);
@@ -167,7 +180,7 @@ void args_classify(char *args, SymbolTable *Table, int **arr)
             (**arr) = (**arr) + 1;
             print_to_ext_file(L + IC, entry->key);
         }
-        else if (entry->type == 4 || entry->type == 2) /*4 = entry , 2 = code (symbol type)*/
+        else if (entry->type == 4 || entry->type == 1 || entry->type == 2) /*4 = entry , 2 = code (symbol type)*/
         {
             (**arr) = (**arr) + 2;
         }
@@ -241,10 +254,14 @@ int parse_args(SymbolTable *Table, char *token, int **arr, opcodeType type)
     if (type == ONE_OPRAND) /*parse if there only one oprand*/
     {
         args_classify(firstArgs, Table, arr);
+        if (is_register(firstArgs))
+        {
+            (**arr) = (**arr) << 2;
+        }
     }
     else if (type == TWO_OPRAND) /*parse if there two oprand*/
     {
-        token = strtok(NULL, "\n\t\r ");
+        token = strtok(NULL, "\n\t\r ,");
         secondArgs = (char *)malloc(strlen(token) + 1);
         strcpy(secondArgs, token);
 
@@ -299,7 +316,8 @@ int parse_opcode(char *token, SymbolTable *Table, int **arr)
     case TWO_OPRAND:
         parse_args(Table, token, arr, TWO_OPRAND);
         break;
-    default: /*if ZERO OPRAND countinue to next line*/
+    default:
+        (*arr)++; /*if ZERO OPRAND countinue to next line*/
         break;
     }
     return 1;

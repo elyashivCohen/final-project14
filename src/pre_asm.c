@@ -1,5 +1,18 @@
 #include "data.h"
 
+void freeMacros(Macro macros[], int count)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (macros[i].lines != NULL)
+        {
+            free(macros[i].lines);
+            macros[i].lines = NULL;
+        }
+    }
+}
+
 /* Function to ignore spaces in the begning of a line: */
 void ignoreLeadingSpaces(char *line)
 {
@@ -170,6 +183,7 @@ int pre_asm(char *input_filename)
     }
 
     /* Free macros memorey */
+    freeMacros(macros, macro_count);
 
     /* Save & close files */
     fclose(output_file);

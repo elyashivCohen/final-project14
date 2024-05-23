@@ -292,33 +292,58 @@ char *whichInstruction(char *instruction)
 
     return "no_instruction";
 }
-
-/* Clean leading & ending spaces */
+/*Clean leading & ending spaces */
 void clean_spaces(char *str)
 {
-
+    char *start = str;
     char *end;
-    char *prev_str = str;
-    char *out = (char *)(malloc(MAX_LINE_LENGTH));
+    char *dst = str;
+    char *src = str;
 
-    strcpy(out, str);
-
-    /* Remove leading spaces */
-    while (isspace((unsigned char)*out))
-        out++;
-
-    /* Check if it was all the spaces */
-    if (*out == 0)
+    if (str == NULL)
+    {
         return;
+    }
+    /* Remove leading spaces*/
+    while (isspace((unsigned char)*src))
+    {
+        src++;
+    }
 
-    /* Remove ending spaces */
-    end = out + strlen(out) - 1;
-    while (end > out && isspace((unsigned char)*end))
-        end--;
+    /* If all spaces or empty string*/
+    if (*src == '\0')
+    {
+        *str = '\0';
+        return;
+    }
 
-    end[1] = '\0';
+    /*Remove excess spaces between words*/
+    while (*src != '\0')
+    {
+        /*Copy non-space characters*/
+        while (*src != '\0' && !isspace((unsigned char)*src))
+        {
+            *dst++ = *src++;
+        }
+        /*Copy a single space if there are multiple spaces*/
+        if (*src != '\0')
+        {
+            *dst++ = ' ';
+            /*Skip over multiple spaces*/
+            while (isspace((unsigned char)*src))
+            {
+                src++;
+            }
+        }
+    }
 
-    strcpy(prev_str, out);
+    /* Remove trailing spaces*/
+    if (dst > str && isspace((unsigned char)*(dst - 1)))
+    {
+        dst--;
+    }
+
+    *dst = '\0';
 }
 
 /* Function to free the memory allocated for the symbol table */

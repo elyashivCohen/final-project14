@@ -1,18 +1,45 @@
 #include "data.h"
 
+/*check if comaa in right place*/
+int valid_comma(char *str)
+{
+    int i = 0;
+    while (*str != '\0')
+    {
+        if (i < 0)
+        {
+            return -1;
+        }
+
+        else if (isdigit(*str) || isalpha(*str))
+        {
+            if (i > 0)
+            {
+                str++;
+                continue;
+            }
+            i++;
+        }
+        else if (*str == ',')
+        {
+            i--;
+        }
+        str++;
+    }
+    return 1;
+}
 void calculate_L(int *l, int dist, int src)
 {
-    if (src == -1 || dist == -1) 
+    if (src == -1 || dist == -1)
     {
         (*l) += 1 + (dist == 2);
     }
-    else 
+    else
     {
         /* Since each aderssing methos is 1 execpt the 2nd method and if
             both are the 3rd method: L=1  */
         (*l) += 2 + (dist == 2) + (src == 2) - (dist == 3 && src == 3);
     }
-    
 }
 
 int validate_source_method(int line_number, opcode op, int addressing_method)
@@ -211,7 +238,7 @@ int get_num_of_operands(int line_number, char *line)
     }
     if (count > 1)
     {
-        printf("Error in line %d: Too many commas in the instruction!\n", line_number);
+        printf("Error in line %d: Too many oprerand or too many commas in the instruction!\n", line_number);
         return -1;
     }
     return count + 1;
@@ -300,7 +327,7 @@ int is_valid_number(int line_number, char *value)
     {
         if (!isdigit(value[i]))
         {
-            printf("Error in line %d: The number value contains a non-digit character: %s\n", line_number, value);
+            printf("Error in line %d: The number value contains a non-digit character or invalid digit: %s\n", line_number, value);
             return 1;
         }
         i++;
@@ -424,7 +451,7 @@ int is_exsits(SymbolTable *st, char *key)
     int index = 0;
     SymbolEntry *current;
 
-    for (current = st->entries; current->next != NULL; current = current->next)
+    for (current = st->entries; current != NULL; current = current->next)
     {
         if (strcmp(current->key, key) == 0)
             return index;
@@ -453,7 +480,7 @@ int check_symbol(int line_number, SymbolTable *st, char *symbol_name)
     return 0;
 }
 
-int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *insteraction_counter ,int *data_counter)
+int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *insteraction_counter, int *data_counter)
 {
     char input_file_path[MAX_LINE_LENGTH];
     FILE *input_file;
@@ -484,6 +511,15 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
         line_count++;
         label_flag = False;
+
+        /*if (strchr(line, '\n') == NULL)
+        {
+            printf("Error in line %d: Exceeding character limit (81 is the max)\n", line_count);
+            error_flag = True;
+            while ((c = fgetc(input_file)) != '\n' && c != EOF)
+                ;
+            continue;
+        }*/
 
         /* Ignore comments */
         if (line[0] == ';')
@@ -547,6 +583,13 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
             rest_of_line = line + strlen(first_field);
             clean_spaces(rest_of_line);
+            if (strlen(rest_of_line) <= 1)
+            {
+                printf("Error in line %d:  %s has a missing instruction/action after label!\n", line_count, first_field);
+                label_flag = True;
+                continue;
+            }
+
             strcpy(line, rest_of_line);
             sscanf(line, "%s", first_field);
 
@@ -583,7 +626,12 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             strings++;
             while (*strings != '"')
             {
-
+                /*if ((!isalpha(*strings)) && (!isdigit(*strings)) && (!isspace(*strings)))
+                {
+                    printf("Error in line %d: Invalid characters in string!\n", line_count);
+                    error_flag = True;
+                    break;
+                }*/
                 character = *strings;
                 add_new_code(&datas_code, &DC, (int)character);
                 strings++;
@@ -614,6 +662,12 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             /* DATA */
             rest_of_line = line + strlen(DATA_DECLARTION);
             clean_spaces(rest_of_line);
+            if (valid_comma(rest_of_line) == -1)
+            {
+                printf("Error in line %d: Unintended comma placements %s\n", line_count, rest_of_line);
+                error_flag = True;
+                continue;
+            }
             str_value = strtok(rest_of_line, ",");
 
             if (str_value == NULL)
@@ -635,7 +689,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                     error_flag = True;
                     break;
                 }
-                else 
+                else
                 {
                     data_value = atoi(str_value);
                 }
@@ -680,7 +734,7 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
             if (whichOpcode(first_field) == no_opcode)
             {
-                printf("Error in line %d: '%s' is not an known opcode!\n", line_count, first_field);
+                printf("Error in line %d: '%s' is not an known opcode or Label that not defined properly!\n", line_count, first_field);
                 error_flag = True;
                 continue;
             }
@@ -738,8 +792,8 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
             }
 
             else
-            { /* num_of_operands == 2 */
-
+            {
+                /* num_of_operands == 2 */
                 /* Find the source adressing method and validate */
                 operand = strtok(rest_of_line, ",");
                 clean_spaces(operand);
@@ -762,6 +816,12 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
                 /* Find the distention adressing method and validate*/
                 operand = strtok(NULL, ",");
+                /*if (operand == NULL)
+                {
+                    printf("Error: In line %d - Missing operand - command 'mov/add/sub' should have 2 operands.\n", line_count);
+                    error_flag = True;
+                    continue;
+                }*/
                 clean_spaces(operand);
                 destination_addressing_method_number = get_addressing_method(line_count, operand);
                 if (destination_addressing_method_number == -1)
