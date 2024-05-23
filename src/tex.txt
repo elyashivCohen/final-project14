@@ -1,0 +1,40 @@
+void clean_spaces(char *str)
+{
+    char *start = str;
+    char *end;
+
+    if (str == NULL)
+    {
+        return;
+    }
+
+    /*Remove leading spaces*/
+    while (isspace((unsigned char)*start))
+    {
+        start++;
+    }
+
+    /* If all spaces or empty string*/
+    if (*start == '\0')
+    {
+        *str = '\0';
+        return;
+    }
+
+    /* Find the end of the string*/
+    end = start + strlen(start) - 1;
+
+    /*Remove trailing spaces*/
+    while (end > start && isspace((unsigned char)*end))
+    {
+        end--;
+    }
+
+    *(end + 1) = '\0';
+
+    /*Move the cleaned string back to the start of the original buffer*/
+    if (start != str)
+    {
+        memmove(str, start, (end - start + 2));
+    }
+}

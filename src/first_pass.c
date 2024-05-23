@@ -508,18 +508,8 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
     /* Read input file line by line: */
     while (fgets(line, MAX_LINE_LENGTH, input_file))
     {
-
         line_count++;
         label_flag = False;
-
-        /*if (strchr(line, '\n') == NULL)
-        {
-            printf("Error in line %d: Exceeding character limit (81 is the max)\n", line_count);
-            error_flag = True;
-            while ((c = fgetc(input_file)) != '\n' && c != EOF)
-                ;
-            continue;
-        }*/
 
         /* Ignore comments */
         if (line[0] == ';')
@@ -816,12 +806,12 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
 
                 /* Find the distention adressing method and validate*/
                 operand = strtok(NULL, ",");
-                /*if (operand == NULL)
+                if (operand == NULL)
                 {
                     printf("Error: In line %d - Missing operand - command 'mov/add/sub' should have 2 operands.\n", line_count);
                     error_flag = True;
                     continue;
-                }*/
+                }
                 clean_spaces(operand);
                 destination_addressing_method_number = get_addressing_method(line_count, operand);
                 if (destination_addressing_method_number == -1)
@@ -836,7 +826,6 @@ int first_pass(char *input_filename, SymbolTable *st, int **binary_code, int *in
                     error_flag = True;
                     continue;
                 }
-
                 /* Add destination adderssing method & op code */
                 code_value += destination_addressing_method_number << 2;
                 code_value += op_code << 6;

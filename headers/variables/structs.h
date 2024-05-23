@@ -1,5 +1,11 @@
 #include "constants.h"
 
+typedef struct Macro
+{
+    char name[MAX_LINE_LENGTH];
+    char *lines;
+} Macro;
+
 typedef enum SymbolType
 {
     mdefine,
